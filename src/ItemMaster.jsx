@@ -81,7 +81,7 @@ export default function ItemMaster() {
       };
       setItems([sampleItem]);
     }
-  }, []);
+  }, [blankForm]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
