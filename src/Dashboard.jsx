@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import PurchaseOrders from "./PurchaseOrder";
 import ItemMaster from "./ItemMaster";
-
+import GoodsReceipt from "./GoodsReceipt"; 
 function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -223,7 +223,7 @@ function Dashboard() {
                 <Route path="/" element={<Navigate to="/purchase-orders" replace />} />
                 <Route path="/items" element={<ItemMaster />} />
                 <Route path="/purchase-orders" element={<PurchaseOrders />} />
-                <Route path="/goods-receipt" element={<GoodsReceiptPage />} />
+                <Route path="/goods-receipt" element={<GoodsReceipt />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </section>

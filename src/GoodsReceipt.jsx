@@ -1,80 +1,77 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-// Sample data for existing purchase orders
-const samplePOs = [
+// Sample data for Goods Receipts
+const sampleGRs = [
   {
     id: 1,
+    grNumber: "GR-20250920-1001",
     poNumber: "PO-20250912-6424",
     supplier: "Acme Supplies Co.",
-    orderDate: "2025-09-11",
-    deliveryDate: "2025-09-19",
-    paymentTerms: "Net 30",
-    status: "Pending",
-    totalAmount: 558.5,
+    receiptDate: "2025-09-20",
+    status: "Received",
     items: [
-      { description: "Men face W", qty: 10, unitPrice: 12, taxPercent: 40 },
-      { description: "Men Face c", qty: 15, unitPrice: 17, taxPercent: 10 },
+      { description: "Men face W", qtyAccepted: 10, qtyRejected: 0, unitPrice: 12, taxPercent: 40 },
+      { description: "Men Face c", qtyAccepted: 14, qtyRejected: 1, unitPrice: 17, taxPercent: 10 },
     ],
-    otherCharges: { shippingFee: 110, notes: "Purchase Order created" },
+    otherCharges: { shippingFee: 110, notes: "Goods received and inspected" },
     billingAddress:
       "DLF phase 3, Moti nagar industrial Area, Delhi,110008 India",
     shippingAddress:
       "DLF phase 3, Moti nagar industrial Area, Delhi,110008 India",
   },
-  // Additional PO records can be added here
 ];
 
 // Outer Grid Columns:
-// PO Number, Supplier, Order Date, Status, Total Amount
+// GR Number, PO Number, Supplier, Receipt Date, Status, Total Amount
 
-const PurchaseOrderSystem = () => {
-  const [purchaseOrders, setPurchaseOrders] = useState(samplePOs);
+const GoodsReceiptSystem = () => {
+  const [goodsReceipts, setGoodsReceipts] = useState(sampleGRs);
   const [filter, setFilter] = useState("");
-  const [selectedPO, setSelectedPO] = useState(null);
+  const [selectedGR, setSelectedGR] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Filtered purchase orders by PO Number or Supplier
-  const filteredPOs = purchaseOrders.filter(
-    (po) =>
-      po.poNumber.toLowerCase().includes(filter.toLowerCase()) ||
-      po.supplier.toLowerCase().includes(filter.toLowerCase())
+  // Filtered goods receipts by GR Number, PO Number or Supplier
+  const filteredGRs = goodsReceipts.filter(
+    (gr) =>
+      gr.grNumber.toLowerCase().includes(filter.toLowerCase()) ||
+      gr.poNumber.toLowerCase().includes(filter.toLowerCase()) ||
+      gr.supplier.toLowerCase().includes(filter.toLowerCase())
   );
 
   // Handlers
   const openCreateForm = () => {
-    setSelectedPO(null);
+    setSelectedGR(null);
     setIsEditing(true);
   };
 
-  const openEditForm = (po) => {
-    setSelectedPO(po);
+  const openEditForm = (gr) => {
+    setSelectedGR(gr);
     setIsEditing(true);
   };
 
   const closeForm = () => {
-    setSelectedPO(null);
+    setSelectedGR(null);
     setIsEditing(false);
   };
 
-  const savePurchaseOrder = (po) => {
-    if (po.id) {
+  const saveGoodsReceipt = (gr) => {
+    if (gr.id) {
       // Edit existing
-      setPurchaseOrders((prev) =>
-        prev.map((p) => (p.id === po.id ? po : p))
+      setGoodsReceipts((prev) =>
+        prev.map((g) => (g.id === gr.id ? gr : g))
       );
     } else {
       // Create new
-      po.id = Date.now();
-      setPurchaseOrders((prev) => [...prev, po]);
+      gr.id = Date.now();
+      setGoodsReceipts((prev) => [...prev, gr]);
     }
     closeForm();
   };
 
   const deleteItem = (id) => {
-    if (window.confirm("Are you sure you want to delete this purchase order?")) {
-      setPurchaseOrders((prev) => prev.filter((po) => po.id !== id));
-      // If currently editing this PO, close form
-      if (selectedPO?.id === id) {
+    if (window.confirm("Are you sure you want to delete this goods receipt?")) {
+      setGoodsReceipts((prev) => prev.filter((gr) => gr.id !== id));
+      if (selectedGR?.id === id) {
         closeForm();
       }
     }
@@ -87,18 +84,16 @@ const PurchaseOrderSystem = () => {
         fontFamily:
           "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       }}
-      className="po-app-root"
+      className="gr-app-root"
     >
       <style>{`
-        /* Color theme from ItemMaster.jsx */
-
-        .po-app-root {
+        /* Reuse PurchaseOrder styles for consistency */
+        .gr-app-root {
           min-height: 100vh;
           background: linear-gradient(180deg, #f3f8ff 0%, #ffffff 100%);
           color: #1f2937;
         }
 
-        /* Buttons */
         button {
           font-family: inherit;
           font-weight: 600;
@@ -111,7 +106,6 @@ const PurchaseOrderSystem = () => {
           filter: brightness(0.9);
         }
 
-        /* Primary button styles */
         button.primary {
           background: linear-gradient(90deg,#3b82f6,#06b6d4);
           color: white;
@@ -122,7 +116,6 @@ const PurchaseOrderSystem = () => {
           background: linear-gradient(90deg,#1e40af,#0891b2);
         }
 
-        /* Ghost button style */
         button.ghost {
           background: transparent;
           color: #3b82f6;
@@ -133,7 +126,6 @@ const PurchaseOrderSystem = () => {
           background: rgba(59,130,246,0.12);
         }
 
-        /* Form inputs */
         input[type="text"], input[type="number"], input[type="date"], select, textarea {
           border-radius: 10px;
           border: 1px solid #e6eefc;
@@ -154,7 +146,6 @@ const PurchaseOrderSystem = () => {
           box-shadow: 0 0 6px #3b82f6aa;
         }
 
-        /* Table styles */
         table {
           font-size: 14px;
           color: #1f2937;
@@ -171,13 +162,12 @@ const PurchaseOrderSystem = () => {
           padding: 12px;
           border-bottom: 1px solid #f3f8ff;
           vertical-align: top;
-          text
+          text-align: left;
         }
         tbody tr:hover {
           background: #eef6ff;
         }
 
-        /* Error text */
         .error {
           color: #b91c1c;
           font-size: 13px;
@@ -185,7 +175,6 @@ const PurchaseOrderSystem = () => {
           user-select: none;
         }
 
-        /* Summary panel styling */
         .summary-panel {
           background-color: #fafafa;
           box-shadow: 0 0 10px rgba(0,0,0,0.05);
@@ -217,7 +206,6 @@ const PurchaseOrderSystem = () => {
           color: #111827;
         }
 
-        /* Responsive adjustments for smaller screens */
         @media (max-width: 920px) {
           .summary-panel {
             position: static;
@@ -225,7 +213,6 @@ const PurchaseOrderSystem = () => {
           }
         }
 
-        /* Action buttons in table */
         .action-btn {
           background: transparent;
           border: none;
@@ -240,12 +227,11 @@ const PurchaseOrderSystem = () => {
         .action-btn:hover {
           color: #2563eb;
         }
-      `}
-      </style>
+      `}</style>
 
       {!isEditing ? (
         <>
-          <h2>Purchase Orders</h2>
+          <h2>Goods Receipts</h2>
           <div
             style={{
               marginBottom: 10,
@@ -255,12 +241,12 @@ const PurchaseOrderSystem = () => {
           >
             <input
               type="text"
-              placeholder="Filter by PO Number or Supplier"
+              placeholder="Filter by GR Number, PO Number or Supplier"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               style={{
                 padding: "6px 10px",
-                width: "250px",
+                width: "300px",
                 borderRadius: 4,
                 border: "1px solid #ccc",
                 fontFamily:
@@ -270,9 +256,9 @@ const PurchaseOrderSystem = () => {
             <button
               onClick={openCreateForm}
               className="primary"
-              aria-label="Create Purchase Order"
+              aria-label="Create Goods Receipt"
             >
-              + Create Purchase Order
+              + Create Goods Receipt
             </button>
           </div>
           <table
@@ -286,9 +272,10 @@ const PurchaseOrderSystem = () => {
           >
             <thead>
               <tr>
+                <th style={{ padding: "10px 12px" }}>GR Number</th>
                 <th style={{ padding: "10px 12px" }}>PO Number</th>
                 <th style={{ padding: "10px 12px" }}>Supplier</th>
-                <th style={{ padding: "10px 12px" }}>Order Date</th>
+                <th style={{ padding: "10px 12px" }}>Receipt Date</th>
                 <th style={{ padding: "10px 12px" }}>Status</th>
                 <th style={{ padding: "10px 12px", textAlign: "right" }}>
                   Total Amount
@@ -297,122 +284,143 @@ const PurchaseOrderSystem = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPOs.length === 0 && (
+              {filteredGRs.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     style={{ padding: 20, textAlign: "center", color: "#777" }}
                   >
-                    No purchase orders found.
+                    No goods receipts found.
                   </td>
                 </tr>
               )}
-              {filteredPOs.map((po) => (
-                <tr
-                  key={po.id}
-                  style={{
-                    borderBottom: "1px solid #eee",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => openEditForm(po)}
-                  title="Click to edit"
-                >
-                  <td style={{ padding: "10px 12px" }}>{po.poNumber}</td>
-                  <td style={{ padding: "10px 12px" }}>{po.supplier}</td>
-                  <td style={{ padding: "10px 12px" }}>
-                    {new Date(po.orderDate).toLocaleDateString()}
-                  </td>
-                  <td style={{ padding: "10px 12px" }}>{po.status}</td>
-                  <td style={{ padding: "10px 12px", textAlign: "right" }}>
-                    ${po.totalAmount.toFixed(2)}
-                  </td>
-                  <td style={{ padding: "10px 12px" }}>
-                    <button
-                      className="action-btn"
-                      title={`Edit purchase order ${po.poNumber}`}
-                      aria-label={`Edit purchase order ${po.poNumber}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEditForm(po);
-                      }}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="action-btn"
-                      title={`Delete purchase order ${po.poNumber}`}
-                      aria-label={`Delete purchase order ${po.poNumber}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteItem(po.id);
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredGRs.map((gr) => {
+                // Calculate total for this GR
+                const subtotal = gr.items.reduce((acc, item) => {
+                  const lineTotal = item.qtyAccepted * item.unitPrice;
+                  return acc + lineTotal;
+                }, 0);
+                const taxTotal = gr.items.reduce((acc, item) => {
+                  const lineTotal = item.qtyAccepted * item.unitPrice;
+                  const taxAmount = (lineTotal * item.taxPercent) / 100;
+                  return acc + taxAmount;
+                }, 0);
+                const grandTotal = subtotal + taxTotal + Number(gr.otherCharges.shippingFee);
+
+                return (
+                  <tr
+                    key={gr.id}
+                    style={{
+                      borderBottom: "1px solid #eee",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => openEditForm(gr)}
+                    title="Click to edit"
+                  >
+                    <td style={{ padding: "10px 12px" }}>{gr.grNumber}</td>
+                    <td style={{ padding: "10px 12px" }}>{gr.poNumber}</td>
+                    <td style={{ padding: "10px 12px" }}>{gr.supplier}</td>
+                    <td style={{ padding: "10px 12px" }}>
+                      {new Date(gr.receiptDate).toLocaleDateString()}
+                    </td>
+                    <td style={{ padding: "10px 12px" }}>{gr.status}</td>
+                    <td style={{ padding: "10px 12px", textAlign: "right" }}>
+                      ${grandTotal.toFixed(2)}
+                    </td>
+                    <td style={{ padding: "10px 12px" }}>
+                      <button
+                        className="action-btn"
+                        title={`Edit goods receipt ${gr.grNumber}`}
+                        aria-label={`Edit goods receipt ${gr.grNumber}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditForm(gr);
+                        }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="action-btn"
+                        title={`Delete goods receipt ${gr.grNumber}`}
+                        aria-label={`Delete goods receipt ${gr.grNumber}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteItem(gr.id);
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </>
       ) : (
-        <PurchaseOrderForm
-          purchaseOrder={selectedPO}
+        <GoodsReceiptForm
+          goodsReceipt={selectedGR}
           onCancel={closeForm}
-          onSave={savePurchaseOrder}
+          onSave={saveGoodsReceipt}
         />
       )}
     </div>
   );
 };
 
-const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
-  // If editing, initialize with existing data; else defaults for new PO
-  const [poNumber, setPoNumber] = useState(
-    purchaseOrder?.poNumber ||
-      `PO-${new Date()
+const GoodsReceiptForm = ({ goodsReceipt, onCancel, onSave }) => {
+  // Initialize fields either from existing GR or defaults for new
+  const [grNumber, setGrNumber] = useState(
+    goodsReceipt?.grNumber ||
+      `GR-${new Date()
         .toISOString()
         .slice(0, 10)
         .replace(/-/g, "")}-${Math.floor(Math.random() * 10000)}`
   );
-  const [supplier, setSupplier] = useState(purchaseOrder?.supplier || "");
-  const [orderDate, setOrderDate] = useState(
-    purchaseOrder?.orderDate || new Date().toISOString().slice(0, 10)
+  const [poNumber, setPoNumber] = useState(goodsReceipt?.poNumber || "");
+  const [supplier, setSupplier] = useState(goodsReceipt?.supplier || "");
+  const [receiptDate, setReceiptDate] = useState(
+    goodsReceipt?.receiptDate || new Date().toISOString().slice(0, 10)
   );
-  const [deliveryDate, setDeliveryDate] = useState(
-    purchaseOrder?.deliveryDate || ""
-  );
-  const [paymentTerms, setPaymentTerms] = useState(
-    purchaseOrder?.paymentTerms || "Net 30"
-  );
+  const [status, setStatus] = useState(goodsReceipt?.status || "Pending");
   const [billingAddress, setBillingAddress] = useState(
-    purchaseOrder?.billingAddress || ""
+    goodsReceipt?.billingAddress || ""
   );
   const [shippingAddress, setShippingAddress] = useState(
-    purchaseOrder?.shippingAddress || ""
+    goodsReceipt?.shippingAddress || ""
   );
   const [items, setItems] = useState(
-    purchaseOrder?.items?.map((item, idx) => ({
+    goodsReceipt?.items?.map((item, idx) => ({
       id: idx + 1,
       description: item.description,
-      qty: item.qty,
+      qtyAccepted: item.qtyAccepted,
+      qtyRejected: item.qtyRejected,
       unitPrice: item.unitPrice,
       taxPercent: item.taxPercent,
-    })) || [{ id: 1, description: "", qty: 1, unitPrice: 0, taxPercent: 0 }]
+    })) || [
+      {
+        id: 1,
+        description: "",
+        qtyAccepted: 0,
+        qtyRejected: 0,
+        unitPrice: 0,
+        taxPercent: 0,
+      },
+    ]
   );
   const [shippingFee, setShippingFee] = useState(
-    purchaseOrder?.otherCharges?.shippingFee || 0
+    goodsReceipt?.otherCharges?.shippingFee || 0
   );
-  const [notes, setNotes] = useState(purchaseOrder?.otherCharges?.notes || "");
+  const [notes, setNotes] = useState(goodsReceipt?.otherCharges?.notes || "");
 
-  // Calculate totals
+  // Calculate totals similar as PO but with qtyAccepted
   const subtotal = items.reduce((acc, item) => {
-    const lineTotal = item.qty * item.unitPrice;
+    const lineTotal = item.qtyAccepted * item.unitPrice;
     return acc + lineTotal;
   }, 0);
 
   const taxTotal = items.reduce((acc, item) => {
-    const lineTotal = item.qty * item.unitPrice;
+    const lineTotal = item.qtyAccepted * item.unitPrice;
     const taxAmount = (lineTotal * item.taxPercent) / 100;
     return acc + taxAmount;
   }, 0);
@@ -432,7 +440,8 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
       {
         id: prev.length ? prev[prev.length - 1].id + 1 : 1,
         description: "",
-        qty: 1,
+        qtyAccepted: 0,
+        qtyRejected: 0,
         unitPrice: 0,
         taxPercent: 0,
       },
@@ -446,23 +455,21 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
   // Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Validate required fields
-    if (!supplier || !orderDate || !deliveryDate) {
-      alert("Please fill in Supplier, Order Date and Expected Delivery.");
+    if (!supplier || !receiptDate || !poNumber) {
+      alert("Please fill in Supplier, PO Number and Receipt Date.");
       return;
     }
     if (items.length === 0) {
       alert("Please add at least one item.");
       return;
     }
-    const po = {
-      id: purchaseOrder?.id || null,
+    const gr = {
+      id: goodsReceipt?.id || null,
+      grNumber,
       poNumber,
       supplier,
-      orderDate,
-      deliveryDate,
-      paymentTerms,
-      status: "Pending",
+      receiptDate,
+      status,
       billingAddress,
       shippingAddress,
       items: items.map(({ id, ...rest }) => rest),
@@ -472,7 +479,7 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
       },
       totalAmount: grandTotal,
     };
-    onSave(po);
+    onSave(gr);
   };
 
   return (
@@ -490,7 +497,7 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       }}
       noValidate
-      aria-label={purchaseOrder ? "Edit Purchase Order form" : "Create Purchase Order form"}
+      aria-label={goodsReceipt ? "Edit Goods Receipt form" : "Create Goods Receipt form"}
     >
       {/* Left side: form fields */}
       <div style={{ flex: 3 }}>
@@ -504,25 +511,25 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
             fontSize: 14,
             padding: "8px 10px",
           }}
-          aria-label="Back to purchase orders"
+          aria-label="Back to goods receipts"
         >
           ← Back
         </button>
         <h3 style={{ marginTop: 0 }}>
-          {purchaseOrder ? "Edit Purchase Order" : "Create Purchase Order"}
+          {goodsReceipt ? "Edit Goods Receipt" : "Create Goods Receipt"}
         </h3>
         <p style={{ color: "#555", marginTop: 0, marginBottom: 20 }}>
           Fill in the details and add items below.
         </p>
 
         <div style={{ marginBottom: 15 }}>
-          <label htmlFor="poNumber" style={{ fontWeight: "600" }}>
-            PO Number
+          <label htmlFor="grNumber" style={{ fontWeight: "600" }}>
+            GR Number
           </label>
           <input
-            id="poNumber"
+            id="grNumber"
             type="text"
-            value={poNumber}
+            value={grNumber}
             readOnly
             style={{
               width: "100%",
@@ -540,6 +547,31 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
         </div>
 
         <div style={{ display: "flex", gap: 20, marginBottom: 15 }}>
+          <div style={{ flex: 2 }}>
+            <label htmlFor="poNumber" style={{ fontWeight: "600" }}>
+              PO Number
+            </label>
+            <input
+              id="poNumber"
+              type="text"
+              value={poNumber}
+              onChange={(e) => setPoNumber(e.target.value)}
+              required
+              placeholder="Reference PO Number"
+              style={{
+                width: "100%",
+                padding: 8,
+                borderRadius: 10,
+                border: "1px solid #e6eefc",
+                marginTop: 5,
+                boxShadow: "inset 0 1px 0 rgba(0,0,0,0.02)",
+                fontSize: 14,
+                color: "#0f172a",
+              }}
+              aria-required="true"
+            />
+          </div>
+
           <div style={{ flex: 2 }}>
             <label htmlFor="supplier" style={{ fontWeight: "600" }}>
               Vendor
@@ -569,14 +601,14 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
           </div>
 
           <div style={{ flex: 1 }}>
-            <label htmlFor="orderDate" style={{ fontWeight: "600" }}>
-              Order Date
+            <label htmlFor="receiptDate" style={{ fontWeight: "600" }}>
+              Receipt Date
             </label>
             <input
-              id="orderDate"
+              id="receiptDate"
               type="date"
-              value={orderDate}
-              onChange={(e) => setOrderDate(e.target.value)}
+              value={receiptDate}
+              onChange={(e) => setReceiptDate(e.target.value)}
               required
               style={{
                 width: "100%",
@@ -638,6 +670,31 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
               }}
             />
           </div>
+          <div style={{ flex: 1 }}>
+            <label htmlFor="status" style={{ fontWeight: "600" }}>
+              Status
+            </label>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              style={{
+                width: "100%",
+                padding: 8,
+                borderRadius: 10,
+                border: "1px solid #e6eefc",
+                marginTop: 5,
+                boxShadow: "inset 0 1px 0 rgba(0,0,0,0.02)",
+                fontSize: 14,
+                color: "#0f172a",
+              }}
+            >
+              <option value="Pending">Pending</option>
+              <option value="Received">Received</option>
+              <option value="Partially Received">Partially Received</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
         </div>
 
         {/* Items section */}
@@ -660,7 +717,7 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
               fontSize: 16,
             }}
           >
-            Items
+            Item Information
           </legend>
           <table
             style={{
@@ -683,7 +740,8 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
                 <th style={{ padding: "6px 10px", width: "40%" }}>
                   SKU / Description
                 </th>
-                <th style={{ padding: "6px 10px", width: "10%" }}>Qty</th>
+                <th style={{ padding: "6px 10px", width: "10%" }}>Qty Accepted</th>
+                <th style={{ padding: "6px 10px", width: "10%" }}>Qty Rejected</th>
                 <th style={{ padding: "6px 10px", width: "15%" }}>
                   Unit Price
                 </th>
@@ -703,7 +761,7 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
             <tbody>
               {items.map((item, idx) => {
                 const lineTotal =
-                  item.qty * item.unitPrice * (1 + item.taxPercent / 100);
+                  item.qtyAccepted * item.unitPrice * (1 + item.taxPercent / 100);
                 return (
                   <tr
                     key={item.id}
@@ -733,10 +791,10 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
                     <td style={{ padding: "6px 10px" }}>
                       <input
                         type="number"
-                        min="1"
-                        value={item.qty}
+                        min="0"
+                        value={item.qtyAccepted}
                         onChange={(e) =>
-                          updateItem(item.id, "qty", Number(e.target.value))
+                          updateItem(item.id, "qtyAccepted", Number(e.target.value))
                         }
                         style={{
                           width: "100%",
@@ -748,7 +806,27 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
                           color: "#0f172a",
                         }}
                         required
-                        aria-label={`Quantity for item ${idx + 1}`}
+                        aria-label={`Quantity accepted for item ${idx + 1}`}
+                      />
+                    </td>
+                    <td style={{ padding: "6px 10px" }}>
+                      <input
+                        type="number"
+                        min="0"
+                        value={item.qtyRejected}
+                        onChange={(e) =>
+                          updateItem(item.id, "qtyRejected", Number(e.target.value))
+                        }
+                        style={{
+                          width: "100%",
+                          padding: 10,
+                          borderRadius: 10,
+                          border: "1px solid #e6eefc",
+                          boxShadow: "inset 0 1px 0 rgba(0,0,0,0.02)",
+                          fontSize: 14,
+                          color: "#0f172a",
+                        }}
+                        aria-label={`Quantity rejected for item ${idx + 1}`}
                       />
                     </td>
                     <td style={{ padding: "6px 10px" }}>
@@ -952,13 +1030,14 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
         <div style={{ marginBottom: 15, fontWeight: "600", fontSize: 16 }}>
           Summary
         </div>
+
         <div style={{ marginBottom: 10 }}>
-          <label htmlFor="deliveryDate">Expected Delivery</label>
+          <label htmlFor="receiptDateSummary">Receipt Date</label>
           <input
-            id="deliveryDate"
+            id="receiptDateSummary"
             type="date"
-            value={deliveryDate}
-            onChange={(e) => setDeliveryDate(e.target.value)}
+            value={receiptDate}
+            onChange={(e) => setReceiptDate(e.target.value)}
             required
             style={{
               width: "100%",
@@ -971,7 +1050,7 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
               color: "#0f172a",
             }}
             aria-required="true"
-            aria-label="Expected Delivery"
+            aria-label="Receipt Date"
           />
         </div>
 
@@ -1077,4 +1156,4 @@ const PurchaseOrderForm = ({ purchaseOrder, onCancel, onSave }) => {
   );
 };
 
-export default PurchaseOrderSystem;
+export default GoodsReceiptSystem;
